@@ -3,7 +3,7 @@
 This docker image can be used as a backup "sidecar" container to a
 TimescaleDB (or PostgreSQL) container. It can make base backups using
 [WAL-E](https://github.com/wal-e/wal-e) as well as continuous WAL
-archiving.  WAL-E will not backup configuration files so they need to be
+archiving. WAL-E will not backup configuration files so they need to be
 handled separately.
 
 ## Functionality
@@ -37,6 +37,7 @@ To do backups, the TimescaleDB and the WAL-E containers need to share
 can access the database files it needs to backup.
 
 ### TimescaleDB / PostgreSQL configuration
+
 To enable continuous archiving for the PostgreSQL WAL, the following
 modifications are necessary in `postgresql.conf`:
 
@@ -57,15 +58,15 @@ docker run -d 5432:5432 timescale/timescaledb postgres \
 ```
 
 ### Sidecar configuration
+
 The WAL-E container is configured using the standard WAL-E environment
 variables. In addition, the HTTP frontend expects the following
 environment variables:
 
-Variable | Use | Default
---- | --- | ---
-WALE_LISTEN_PORT | port  | 80
-PGDATA | the TimescaleDB/PostgreSQL data dir | `/var/lib/postgresql/data`
-PGWAL | the TimescaleDB/PostgreSQL WAL log dir (defaults to PostgreSQL 10+ naming) | `${PGDATA}/pg_wal`
-
+| Variable         | Use                                                                        | Default                    |
+| ---------------- | -------------------------------------------------------------------------- | -------------------------- |
+| WALE_LISTEN_PORT | port                                                                       | 80                         |
+| PGDATA           | the TimescaleDB/PostgreSQL data dir                                        | `/var/lib/postgresql/data` |
+| PGWAL            | the TimescaleDB/PostgreSQL WAL log dir (defaults to PostgreSQL 10+ naming) | `${PGDATA}/pg_wal`         |
 
 [ts-docker]: https://github.com/timescale/timescaledb-docker
