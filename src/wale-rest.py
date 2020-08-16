@@ -8,7 +8,7 @@ import logging.config
 import os
 from logging.config import dictConfig
 
-API_PORT = int(os.getenv('WALE_LISTEN_PORT', '80'))
+API_PORT = int(os.getenv('WALE_LISTEN_PORT', '8000'))
 PGDATA = os.getenv('PGDATA', '/var/lib/postgresql/data')
 PGWAL = os.getenv('PGWAL', PGDATA + '/pg_wal')
 WALE_BIN = os.getenv('WALE_BIN', 'wal-g')

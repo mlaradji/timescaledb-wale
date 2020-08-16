@@ -33,4 +33,4 @@ COPY run.sh .
 ENTRYPOINT [ "/app/run.sh" ]
 
 # Add a healthcheck.
-HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:80/ping || exit 1
+HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:8000/ping || exit 1
