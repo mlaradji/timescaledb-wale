@@ -16,7 +16,7 @@ RUN apt-get install python3-dev libffi-dev gcc musl-dev make libc-dev lzo-dev -y
 
 # Install python dependencies.
 USER 1001
-pipenv install --deploy --ignore-pipfile
+RUN pipenv install --deploy --ignore-pipfile
 
 # Remove unneeded dependencies.
 USER root
