@@ -38,8 +38,8 @@ class Postgres(pydantic.BaseSettings):
     Postgres settings.
     """
 
-    PG.DATA: pydantic.DirectoryPath = '/var/lib/postgresql/data'
-    PG.WAL: pydantic.DirectoryPath = '/var/lib/postgresql/data/pg_wal'
+    DATA: pydantic.DirectoryPath = '/var/lib/postgresql/data'
+    WAL: pydantic.DirectoryPath = '/var/lib/postgresql/data/pg_wal'
 
     class Config(BaseSettingsConfig):
         env_prefix: str = "PG"
