@@ -1,21 +1,52 @@
 #!/usr/bin/python
 
-from flask import Flask, request
 from subprocess import Popen
 import sys
 import logging
 import logging.config
 import os
 from logging.config import dictConfig
+import pydantic
 
-API_PORT = int(os.getenv('WALE_LISTEN_PORT', '8000'))
-PGDATA = os.getenv('PGDATA', '/var/lib/postgresql/data')
-PGWAL = os.getenv('PGWAL', PGDATA + '/pg_wal')
-WALE_BIN = os.getenv('WALE_BIN', 'wal-g')
-WALE_FLAGS = os.getenv('WALE_FLAGS', '')
-WALE_PUSH_FLAGS = os.getenv('WALE_PUSH_FLAGS', '')
-WALE_FETCH_FLAGS = os.getenv('WALE_FETCH_FLAGS', '-p=0')
+from flask import Flask, request
 
+class BaseSettingsConfig:
+    case_sensitive = True
+
+class Api(pydantic.BaseSettings):
+    """Flask application settings."""
+    HOST: str = '0.0.0.0'
+    PORT: int = 8000
+
+    class Config(BaseSettingsConfig):
+        env_prefix = "API_"
+
+class WalG(pydantic.BaseSettings):
+    """
+    `wal-g` binary parameters.
+    """
+    BIN: str = 'wal-g'
+    FLAGS: str = ''
+    PUSH_FLAGS: str = ''
+    FETCH_FLAGS: str = '-p=0'
+
+    class Config(BaseSettingsConfig):
+        env_prefix: str = "WALG_"
+
+class Postgres(pydantic.BaseSettings):
+    """
+    Postgres settings.
+    """
+
+    PG.DATA: pydantic.DirectoryPath = '/var/lib/postgresql/data'
+    PG.WAL: pydantic.DirectoryPath = '/var/lib/postgresql/data/pg_wal'
+
+    class Config(BaseSettingsConfig):
+        env_prefix: str = "PG"
+
+API = Api()
+WALG = WalG()
+PG = Postgres()
 
 class WaleWrapper:
 
@@ -51,7 +82,7 @@ class WaleWrapper:
         self.api.logger.info('Ready to receive wal-e commands')
 
         # start API
-        self.api.run(host='0.0.0.0', port=API_PORT, debug=False, threaded=True)
+        self.api.run(host=API.HOST, port=API.PORT, debug=False, threaded=True)
 
     def perform_command(self, cmd, log_line, error_line, return_line):
 
@@ -71,15 +102,15 @@ class WaleWrapper:
         if '/' in path:
             path = path.split('/')[-1]
 
-        file_path = PGWAL + '/' + path
+        file_path = PG.WAL + '/' + path
 
-        command = [WALE_BIN]
-        if len(WALE_FLAGS) > 0:
-            for s in WALE_FLAGS.split():
+        command = [WALG.BIN]
+        if len(WALG.FLAGS) > 0:
+            for s in WALG.FLAGS.split():
                 command.append(s)
         command.append('wal-push')
-        if len(WALE_PUSH_FLAGS) > 0:
-            for s in WALE_PUSH_FLAGS.split():
+        if len(WALG.PUSH_FLAGS) > 0:
+            for s in WALG.PUSH_FLAGS.split():
                 command.append(s)
         command.extend([file_path])
         print(command)
@@ -96,15 +127,15 @@ class WaleWrapper:
 
         file_id = path
 
-        file_path  = PGWAL + '/' + file_id
+        file_path  = PG.WAL + '/' + file_id
 
-        command = [WALE_BIN]
-        if len(WALE_FLAGS) > 0:
-            for s in WALE_FLAGS.split():
+        command = [WALG.BIN]
+        if len(WALG.FLAGS) > 0:
+            for s in WALG.FLAGS.split():
                 command.append(s)
         command.append('wal-fetch')
-        if len(WALE_FETCH_FLAGS) > 0:
-            for s in WALE_FETCH_FLAGS.split():
+        if len(WALG.FETCH_FLAGS) > 0:
+            for s in WALG.FETCH_FLAGS.split():
                 command.append(s)
         command.extend([file_id, file_path])
         print(command)
@@ -115,14 +146,14 @@ class WaleWrapper:
                                     'Fetched wal {}'.format(file_id))
 
     def backup_push(self):
-        file_path = PGDATA
-        command = [WALE_BIN]
-        if len(WALE_FLAGS) > 0:
-            for s in WALE_FLAGS.split():
+        file_path = PG.DATA
+        command = [WALG.BIN]
+        if len(WALG.FLAGS) > 0:
+            for s in WALG.FLAGS.split():
                 command.append(s)
         command.append('backup-push')
-        if len(WALE_PUSH_FLAGS) > 0:
-            for s in WALE_PUSH_FLAGS.split():
+        if len(WALG.PUSH_FLAGS) > 0:
+            for s in WALG.PUSH_FLAGS.split():
                 command.append(s)
         command.extend([file_path])
         print(command)
