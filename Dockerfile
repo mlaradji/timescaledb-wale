@@ -4,10 +4,25 @@ FROM bitnami/wal-g:latest
 
 # Install api dependencies.
 COPY Pipfile Pipfile.lock ./
-RUN apt-get update && apt-get install python3.8 pipenv python3-dev libffi-dev gcc musl-dev make libc-dev lzo-dev -y &&\
-    pipenv install --deploy --ignore-pipfile && \
-    apt-get purge python3-dev libffi-dev gcc musl-dev make libc-dev lzo-dev -y && \
+
+# Fix from https://stackoverflow.com/a/57930100/9954163.
+USER root
+RUN apt-get update && apt-get install python3.8 pipenv
+USER 1001
+
+# Install build dependencies.
+USER root
+RUN apt-get install python3-dev libffi-dev gcc musl-dev make libc-dev lzo-dev -y
+
+# Install python dependencies.
+USER 1001
+pipenv install --deploy --ignore-pipfile
+
+# Remove unneeded dependencies.
+USER root
+RUN apt-get purge python3-dev libffi-dev gcc musl-dev make libc-dev lzo-dev -y && \
     apt-get autoremove -y && apt-get clean -y
+USER 1001
 
 COPY src/wale-rest.py .
 COPY run.sh /
