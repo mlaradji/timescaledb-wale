@@ -4,4 +4,4 @@ WALE_S3_PREFIX=${WALE_S3_PREFIX:-s3://${WALE_S3_BUCKET:-wale_bucket}/${WALE_S3_P
 
 export WALE_S3_PREFIX
 
-exec pipenv run python3 wale-rest.py $@
+exec python3 wale-rest.py $@
