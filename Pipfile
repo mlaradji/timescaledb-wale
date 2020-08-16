@@ -9,10 +9,7 @@ bandit = "*"
 pylint = "*"
 
 [packages]
-wal-e = "*"
-boto3 = "*"
 Flask = "*"
-pydantic = "*"
 
 [requires]
-python_version = "3.5"
+python_version = "3.8"
