@@ -10,7 +10,7 @@ pylint = "*"
 
 [packages]
 wal-e = "*"
-boto = "*"
+boto3 = "*"
 Flask = "*"
 pydantic = "*"
 
