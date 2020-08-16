@@ -30,7 +30,7 @@ WORKDIR /app/
 COPY src/wale-rest.py .
 COPY run.sh .
 
-CMD [ "/app/run.sh" ]
+ENTRYPOINT [ "/app/run.sh" ]
 
 # Add a healthcheck.
 HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:80/ping || exit 1
