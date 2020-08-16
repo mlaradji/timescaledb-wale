@@ -22,7 +22,7 @@ RUN apt-get purge python3.7-dev libffi-dev gcc musl-dev make libc-dev -y && \
 
 COPY src/walg-rest.py ./
 
-ENTRYPOINT [ "python3 /app/walg-rest.py $@" ]
+ENTRYPOINT [ "./entrypoint.sh" ]
 
 # Add a healthcheck.
 HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:8000/ping || exit 1
