@@ -15,19 +15,14 @@ RUN apt-get install python3.7-dev libffi-dev gcc musl-dev make libc-dev -y
 # Install api dependencies.
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --deploy --ignore-pipfile --system
-# RUN chown -R 1001 ./
 
 # Remove unneeded dependencies.
 RUN apt-get purge python3.7-dev libffi-dev gcc musl-dev make libc-dev -y && \
     apt-get autoremove -y && apt-get clean -y
 
-# USER 1001
-WORKDIR /app/
+COPY src/walg-rest.py ./
 
-COPY src/wale-rest.py ./
-COPY run.sh ./
-
-ENTRYPOINT [ "/app/run.sh" ]
+ENTRYPOINT [ "python3 walg-rest.py $@" ]
 
 # Add a healthcheck.
 HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:8000/ping || exit 1

@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from typing import Tuple, Union, Any, List
+from typing_extensions import Literal
 from subprocess import Popen
 import sys
 import logging
@@ -9,6 +11,7 @@ from logging.config import dictConfig
 import pydantic
 
 from flask import Flask, request
+from devtools import debug
 
 class BaseSettingsConfig:
     case_sensitive = True
@@ -48,11 +51,13 @@ API = Api()
 WALG = WalG()
 PG = Postgres()
 
+CommandOutput = Union[Tuple[Any, int], str]
+
 class WaleWrapper:
 
-    api = None
+    api: Flask
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         self.api = Flask('RestAPI')
 
@@ -84,7 +89,7 @@ class WaleWrapper:
         # start API
         self.api.run(host=API.HOST, port=API.PORT, debug=False, threaded=True)
 
-    def perform_command(self, cmd, log_line, error_line, return_line):
+    def perform_command(self, cmd: List[str], log_line: str, error_line: str, return_line: str) -> CommandOutput:
 
         self.api.logger.info('{}: {}'.format(log_line, cmd))
 
@@ -97,12 +102,12 @@ class WaleWrapper:
 
         return return_line
 
-    def push(self, path):
+    def push(self, path: str) -> CommandOutput:
 
         if '/' in path:
             path = path.split('/')[-1]
 
-        file_path = PG.WAL + '/' + path
+        file_path = str(PG.WAL / path)
 
         command = [WALG.BIN]
         if len(WALG.FLAGS) > 0:
@@ -113,21 +118,21 @@ class WaleWrapper:
             for s in WALG.PUSH_FLAGS.split():
                 command.append(s)
         command.extend([file_path])
-        print(command)
+        debug(command)
 
         return self.perform_command(command,
                                     'Pushing wal file {}'.format(file_path),
                                     'Failed to push wal {}'.format(file_path),
                                     'Pushed wal {}'.format(file_path))
 
-    def fetch(self, path):
+    def fetch(self, path: str) -> CommandOutput:
 
         if '/' in path:
             path = path.split('/')[-1]
 
         file_id = path
 
-        file_path  = PG.WAL + '/' + file_id
+        file_path = str(PG.WAL / file_id)
 
         command = [WALG.BIN]
         if len(WALG.FLAGS) > 0:
@@ -138,15 +143,15 @@ class WaleWrapper:
             for s in WALG.FETCH_FLAGS.split():
                 command.append(s)
         command.extend([file_id, file_path])
-        print(command)
+        debug(command)
 
         return self.perform_command(command,
                                     'Fetching wal {}'.format(file_id),
                                     'Failed to fetch wal {}'.format(file_id),
                                     'Fetched wal {}'.format(file_id))
 
-    def backup_push(self):
-        file_path = PG.DATA
+    def backup_push(self) -> CommandOutput:
+        file_path = str(PG.DATA)
         command = [WALG.BIN]
         if len(WALG.FLAGS) > 0:
             for s in WALG.FLAGS.split():
@@ -156,14 +161,14 @@ class WaleWrapper:
             for s in WALG.PUSH_FLAGS.split():
                 command.append(s)
         command.extend([file_path])
-        print(command)
+        debug(command)
 
         return self.perform_command(command,
                                     'Pushing backup {}'.format(file_path),
                                     'Failed to push backup {}'.format(file_path),
                                     'Pushed backup {}'.format(file_path))
 
-    def ping(self):
+    def ping(self) -> Literal['pong']:
         return 'pong'
 
 

@@ -7,10 +7,12 @@ verify_ssl = true
 mypy = "*"
 bandit = "*"
 pylint = "*"
+black = "==19.10b0"
 
 [packages]
 Flask = "*"
 pydantic = "*"
+devtools = "*"
 
 [requires]
 python_version = "3.7"
