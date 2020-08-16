@@ -21,6 +21,7 @@ RUN apt-get purge python3.7-dev libffi-dev gcc musl-dev make libc-dev -y && \
     apt-get autoremove -y && apt-get clean -y
 
 COPY src/walg-rest.py ./
+COPY entrypoint.sh ./
 
 ENTRYPOINT [ "./entrypoint.sh" ]
 
