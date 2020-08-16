@@ -12,7 +12,7 @@ API_PORT = int(os.getenv('WALE_LISTEN_PORT', '8000'))
 PGDATA = os.getenv('PGDATA', '/var/lib/postgresql/data')
 PGWAL = os.getenv('PGWAL', PGDATA + '/pg_wal')
 WALE_BIN = os.getenv('WALE_BIN', 'wal-g')
-WALE_FLAGS = os.getenv('WALE_FLAGS', '--terse')
+WALE_FLAGS = os.getenv('WALE_FLAGS', '')
 WALE_PUSH_FLAGS = os.getenv('WALE_PUSH_FLAGS', '')
 WALE_FETCH_FLAGS = os.getenv('WALE_FETCH_FLAGS', '-p=0')
 
