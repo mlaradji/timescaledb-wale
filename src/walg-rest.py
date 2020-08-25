@@ -31,7 +31,7 @@ class WalG(pydantic.BaseSettings):
     BIN: str = 'wal-g'
     FLAGS: str = ''
     PUSH_FLAGS: str = ''
-    FETCH_FLAGS: str = '-p=0'
+    FETCH_FLAGS: str = ''
 
     class Config(BaseSettingsConfig):
         env_prefix: str = "WALG_"
